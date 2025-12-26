@@ -1,0 +1,11 @@
+Model Information:
+* title:	M
+* source:	https://sketchfab.com/3d-models/m-ee2a6ada864a4951a8f2d68a5a54d4f9
+* author:	mr_wosh (https://sketchfab.com/mr_wosh)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "M" (https://sketchfab.com/3d-models/m-ee2a6ada864a4951a8f2d68a5a54d4f9) by mr_wosh (https://sketchfab.com/mr_wosh) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
