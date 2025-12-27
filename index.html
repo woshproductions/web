@@ -58,14 +58,14 @@
             color: #fff;
             font-size: 2rem;
             font-weight: 300;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.01em;
             text-transform: lowercase;
             margin-bottom: 2rem;
         }
 
         .social-links {
             display: flex;
-            gap: 2rem;
+            gap: 1.5rem;
         }
 
         .social-link {
@@ -103,8 +103,8 @@
             }
 
             .title {
-                font-size: 1.4rem;
-                letter-spacing: 0.1em;
+                font-size: 1.6rem;
+                letter-spacing: 0.01em;
                 margin-bottom: 1.5rem;
             }
 
@@ -115,7 +115,7 @@
             }
 
             .social-link {
-                font-size: 0.85rem;
+                font-size: 1rem;
             }
         }
     </style>
@@ -130,11 +130,11 @@
             <h1 class="title">wosh.productions</h1>
             <div class="social-links">
                 <a href="https://www.instagram.com/wosh.productions" target="_blank" rel="noopener"
-                    class="social-link">instagram</a>
+                    class="social-link">Instagram</a>
                 <a href="https://www.tiktok.com/@wosh.productions" target="_blank" rel="noopener"
-                    class="social-link">tiktok</a>
+                    class="social-link">TikTok</a>
                 <a href="https://www.youtube.com/@wosh.productions" target="_blank" rel="noopener"
-                    class="social-link">youtube</a>
+                    class="social-link">YouTube</a>
             </div>
         </div>
     </div>
@@ -179,7 +179,7 @@
         container.appendChild(renderer.domElement);
 
         // Lighting - lightweight setup
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
         scene.add(ambientLight);
 
         const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
