@@ -24,9 +24,8 @@
             --theme-accent: #e6cda7;
             --dark-900: #000000;
             /* Completely black background as requested */
-            --dark-800: #121212;
-            --dark-800: #121212;
-            --dark-700: #1a1a1a;
+            --dark-800: #000000;
+            --dark-700: #000000;
             --neutral-100: #f5f5f5;
             --transition-ease: cubic-bezier(0.16, 1, 0.3, 1);
             --transition-fast: 0.3s var(--transition-ease);
@@ -335,13 +334,19 @@
         @media (max-width: 1024px) {
             .container {
                 flex-direction: column;
-                padding: var(--spacing-xl) var(--spacing-md);
+                /* Reduced top/bottom padding to halve the gap as requested */
+                padding: var(--spacing-md) var(--spacing-md);
                 min-height: auto;
             }
 
             .logo-section {
-                flex: 0 0 70vh;
+                flex: 0 0 50vh;
+                /* Reduced from 70vh to remove excess vertical gap */
                 padding: 0;
+                /* Add 10vh above by padding-top and aligning to start */
+                padding-top: 10vh;
+                align-items: flex-start;
+                /* Align to top to respect padding */
                 width: 100%;
                 order: 1;
             }
@@ -349,16 +354,18 @@
             .content-section {
                 flex: 0 0 auto;
                 width: 100%;
-                padding: var(--spacing-xl) 0 0;
+                /* Reduced top padding to halve the gap between canvas and title */
+                padding: var(--spacing-md) 0 0;
                 order: 2;
                 text-align: center;
                 align-items: center;
             }
 
             #canvas-container {
-                height: 50vh;
-                /* Reduced height on mobile */
-                min-height: 300px;
+                height: 40vh;
+                /* Reduced height to fit (50vh - 10vh padding) */
+                min-height: 250px;
+                /* Reduced min-height slightly */
                 max-height: 400px;
             }
         }
