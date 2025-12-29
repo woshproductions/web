@@ -512,6 +512,7 @@
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
         import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
+        import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
         // Scene setup
         const container = document.getElementById('canvas-container');
@@ -568,13 +569,18 @@
 
         // Environment map for realistic reflections
         const pmremGenerator = new THREE.PMREMGenerator(renderer);
+        pmremGenerator.compileEquirectangularShader();
         let envMap;
 
-        // Load environment map asynchronously
-        new THREE.TextureLoader().load('https://threejs.org/examples/textures/equirectangular/royal_esplanade_1k.hdr', function (texture) {
-            texture.mapping = THREE.EquirectangularReflectionMapping;
-            envMap = pmremGenerator.fromEquirectangular(texture).texture;
-        });
+        // Load environment map asynchronously with corrected loader and path
+        new RGBELoader()
+            .setPath('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/equirectangular/')
+            .load('pedestrian_overpass_1k.hdr', function (texture) {
+                envMap = pmremGenerator.fromEquirectangular(texture).texture;
+                scene.environment = envMap; // Apply to all materials in scene
+                texture.dispose();
+                pmremGenerator.dispose();
+            });
 
         // OrbitControls with refined settings
         const controls = new OrbitControls(camera, renderer.domElement);
@@ -605,7 +611,7 @@
         const bloomPass = new UnrealBloomPass(
             new THREE.Vector2(window.innerWidth, window.innerHeight),
             0.1,    // Strength
-            0.1,    // Radius
+            0.05,    // Radius
             0.1    // Threshold
         );
         composer.addPass(bloomPass);
@@ -665,8 +671,14 @@
             },
             (xhr) => {
                 // Update loading progress (optional)
-                const percent = (xhr.loaded / xhr.total * 100).toFixed(0);
-                document.querySelector('.loading-text').textContent = `Loading ${percent}%`;
+                // Use lengthComputable and clamp to 100% to avoid overflow (>100%) due to server compression
+                if (xhr.lengthComputable && xhr.total > 0) {
+                    const percent = Math.min((xhr.loaded / xhr.total * 100), 100).toFixed(0);
+                    document.querySelector('.loading-text').textContent = `Loading ${percent}%`;
+                } else {
+                    // Fallback if total is unknown or zero
+                    document.querySelector('.loading-text').textContent = 'Crafting experience...';
+                }
             },
             (error) => {
                 console.error('Error loading model:', error);
