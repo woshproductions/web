@@ -340,8 +340,8 @@
             }
 
             .logo-section {
-                flex: 0 0 50vh;
-                /* Reduced from 70vh to remove excess vertical gap */
+                flex: 0 0 44vh;
+                /* Reduced from 50vh to 44vh to reduce bottom gap (2vh top + 40vh canvas + 2vh bottom) */
                 padding: 0;
                 /* Add 10vh above by padding-top and aligning to start */
                 padding-top: 2vh;
@@ -354,8 +354,8 @@
             .content-section {
                 flex: 0 0 auto;
                 width: 100%;
-                /* Reduced top padding to halve the gap between canvas and title */
-                padding: var(--spacing-md) 0 0;
+                /* Reduced top padding by half (from spacing-md to spacing-sm) */
+                padding: var(--spacing-sm) 0 0;
                 order: 2;
                 text-align: center;
                 align-items: center;
