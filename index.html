@@ -12,12 +12,11 @@
     <link rel="preload" href="w%20logo/scene.gltf" as="fetch" crossorigin>
     <link rel="preload" href="w%20logo/scene.bin" as="fetch" crossorigin>
     <link rel="preload"
-        href="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/equirectangular/pedestrian_overpass_1k.hdr"
+        href="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/equirectangular/venice_sunset_1k.hdr"
         as="fetch" crossorigin>
 
     <!-- Preconnect to CDNs -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://raw.githubusercontent.com">
 
     <!-- SEO & Accessibility -->
@@ -37,12 +36,10 @@
             --theme-primary: #ffeed9;
             --dark-900: #000000;
             --transition-ease: cubic-bezier(0.16, 1, 0.3, 1);
-            --transition-fast: 0.3s var(--transition-ease);
             --transition-normal: 0.5s var(--transition-ease);
             --spacing-sm: 1rem;
             --spacing-md: 1.5rem;
             --spacing-lg: 2rem;
-            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
             --elevation-high: 0 10px 40px rgba(0, 0, 0, 0.25);
             --border-radius-lg: 16px;
         }
@@ -522,7 +519,6 @@
         import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-        import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
         import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
         // Scene setup
@@ -578,7 +574,7 @@
 
         new RGBELoader()
             .setPath('https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/textures/equirectangular/')
-            .load('pedestrian_overpass_1k.hdr', function (texture) {
+            .load('venice_sunset_1k.hdr', function (texture) {
                 envMap = pmremGenerator.fromEquirectangular(texture).texture;
                 scene.environment = envMap;
                 texture.dispose();
@@ -605,6 +601,7 @@
         composer.setSize(container.clientWidth, container.clientHeight);
         composer.addPass(new RenderPass(scene, camera));
 
+        // Restored bloom effect for all devices
         const bloomPass = new UnrealBloomPass(
             new THREE.Vector2(window.innerWidth, window.innerHeight),
             0.15, 0.04, 0.15
@@ -627,13 +624,7 @@
                 model = gltf.scene;
                 // Scale adjusted for the specific model if needed, usually trial and error or inspection
                 // Resetting scale to 1.0 initially to see size, or keeping 0.8
-                model.scale.set(1.0, 1.0, 1.0); // Assuming the new model might need different scaling, but starting with safe bet or keeping similar. 
-                // However, often raw models are huge or tiny. "w logo" suggests it might be purpose built. 
-                // Let's try to keep it reasonable. The previous robot was 0.8.
-                // I will try 10.0 because usually these exports are small, or 1.0. 
-                // Let's stick to a reasonable default and if it's invisible we adjust.
-                // Actually, let's keep it at 1.0 for now, or maybe 10 if it's from a standard export.
-                // Let's try 1.5.
+                model.scale.set(1.0, 1.0, 1.0); // Assuming the new model might need different scaling, but starting with safe bet or keeping similar.
                 model.scale.set(1.0, 1.0, 1.0);
                 model.position.y = 0.0;
 
@@ -727,8 +718,10 @@
                 // We want to oscillate around the intended Y position (0.0 seems good for center)
                 model.position.y = 0.0 + Math.sin(elapsedTime * floatingFrequency) * floatingAmplitude;
 
-                // Subtle pulsing of bloom intensity
-                bloomPass.strength = 0.3 + Math.sin(elapsedTime * 0.8) * 0.05;
+                // Subtle pulsing of bloom intensity - restored for all devices
+                if (bloomPass) {
+                    bloomPass.strength = 0.3 + Math.sin(elapsedTime * 0.8) * 0.05;
+                }
             }
 
             controls.update(delta);
