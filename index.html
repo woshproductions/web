@@ -22,8 +22,7 @@
 
     <!-- SEO & Accessibility -->
     <meta name="theme-color" content="#000000">
-    <link rel="icon"
-        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>W</text></svg>">
+    <link rel="icon" type="image/png" href="favicon-32x32.png">
 
     <!-- Inline social icons as SVG to avoid FontAwesome payload -->
     <!-- Removed FontAwesome link -->
@@ -35,33 +34,17 @@
         }
 
         :root {
-            /* Refined color palette with professional variations */
             --theme-primary: #ffeed9;
-            --theme-secondary: #f0e6d2;
-            --theme-accent: #e6cda7;
-            --theme-accent: #e6cda7;
             --dark-900: #000000;
-            /* Completely black background as requested */
-            --dark-800: #000000;
-            --dark-700: #000000;
-            --neutral-100: #f5f5f5;
             --transition-ease: cubic-bezier(0.16, 1, 0.3, 1);
             --transition-fast: 0.3s var(--transition-ease);
             --transition-normal: 0.5s var(--transition-ease);
-            --transition-slow: 0.8s var(--transition-ease);
-            --spacing-xs: 0.5rem;
             --spacing-sm: 1rem;
             --spacing-md: 1.5rem;
             --spacing-lg: 2rem;
-            --spacing-xl: 3rem;
-            --border-radius-sm: 4px;
-            --border-radius-md: 8px;
-            --border-radius-lg: 16px;
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
-            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
             --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
-            --elevation-low: 0 2px 10px rgba(0, 0, 0, 0.08);
             --elevation-high: 0 10px 40px rgba(0, 0, 0, 0.25);
+            --border-radius-lg: 16px;
         }
 
         html {
@@ -559,6 +542,10 @@
         );
         camera.position.set(0, 0.5, 8);
 
+        const isMobile = window.innerWidth <= 768;
+        const maxDPR = isMobile ? 1.5 : 2;
+        const pixelRatio = Math.min(window.devicePixelRatio, maxDPR);
+
         // Renderer with professional settings
         const renderer = new THREE.WebGLRenderer({
             antialias: true,
@@ -566,32 +553,21 @@
             powerPreference: "high-performance"
         });
         renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setPixelRatio(pixelRatio);
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1.0;
         container.appendChild(renderer.domElement);
 
-        // Advanced lighting setup
-        // Ambient light for base illumination
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        // Advanced lighting setup simplified for performance
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
         scene.add(ambientLight);
 
-        // Main key light
-        const keyLight = new THREE.DirectionalLight(0xffffff, 2.5);
+        const keyLight = new THREE.DirectionalLight(0xffffff, 2.0);
         keyLight.position.set(5, 3, 5);
-        keyLight.castShadow = true;
-        keyLight.shadow.mapSize.width = 1024;
-        keyLight.shadow.mapSize.height = 1024;
         scene.add(keyLight);
 
-        // Fill light to soften shadows
-        const fillLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        fillLight.position.set(-5, 0, 3);
-        scene.add(fillLight);
-
-        // Back light for separation from background
-        const rimLight = new THREE.DirectionalLight(0xffeed9, 1.2);
+        const rimLight = new THREE.DirectionalLight(0xffeed9, 1.0);
         rimLight.position.set(0, 2, -5);
         scene.add(rimLight);
 
@@ -600,54 +576,42 @@
         pmremGenerator.compileEquirectangularShader();
         let envMap;
 
-        // Load environment map asynchronously with corrected loader and path
         new RGBELoader()
             .setPath('https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/textures/equirectangular/')
             .load('pedestrian_overpass_1k.hdr', function (texture) {
                 envMap = pmremGenerator.fromEquirectangular(texture).texture;
-                scene.environment = envMap; // Apply to all materials in scene
+                scene.environment = envMap;
                 texture.dispose();
                 pmremGenerator.dispose();
             });
 
-        // OrbitControls with refined settings
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
-        controls.dampingFactor = 0.06;
+        controls.dampingFactor = 0.05;
         controls.enablePan = false;
         controls.enableZoom = false;
         controls.autoRotate = true;
-        controls.autoRotateSpeed = 0.6; // Slower rotation for elegance
+        controls.autoRotateSpeed = 0.7;
 
-        // Post-processing for professional visuals
-        // Use a render target with Multisample Anti-Aliasing (MSAA)
+        // Optimized post-processing
         const renderTarget = new THREE.WebGLRenderTarget(
-            container.clientWidth * Math.min(window.devicePixelRatio, 2),
-            container.clientHeight * Math.min(window.devicePixelRatio, 2),
-            {
-                samples: 8 // High sample count for smooth edges
-            }
+            container.clientWidth * pixelRatio,
+            container.clientHeight * pixelRatio,
+            { samples: isMobile ? 2 : 4 } // Lower samples on mobile to fix high TBT
         );
 
         const composer = new EffectComposer(renderer, renderTarget);
-        // CRITICAL: Set pixel ratio for composer to avoid pixelation on high DPI screens
-        composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        composer.setPixelRatio(pixelRatio);
         composer.setSize(container.clientWidth, container.clientHeight);
-        const renderPass = new RenderPass(scene, camera);
-        composer.addPass(renderPass);
+        composer.addPass(new RenderPass(scene, camera));
 
         const bloomPass = new UnrealBloomPass(
             new THREE.Vector2(window.innerWidth, window.innerHeight),
-            0.1,    // Strength
-            0.05,    // Radius
-            0.1    // Threshold
+            0.15, 0.04, 0.15
         );
         composer.addPass(bloomPass);
 
-        // Anti-aliasing pass (SMAA) - crucial when using EffectComposer
-        // SMAA combined with MSAA (above) gives the best results
-        const smaaPass = new SMAAPass(window.innerWidth * renderer.getPixelRatio(), window.innerHeight * renderer.getPixelRatio());
-        composer.addPass(smaaPass);
+        // Removed SMAAPass to reduce shader compilation time and TBT
 
         // Load 3D model with error handling
         let model;
@@ -673,24 +637,25 @@
                 model.scale.set(1.0, 1.0, 1.0);
                 model.position.y = 0.0;
 
-                // Apply professional materials
-                const themeColor = getComputedStyle(document.documentElement).getPropertyValue('--theme-primary').trim();
-                const secondaryColor = getComputedStyle(document.documentElement).getPropertyValue('--theme-secondary').trim();
+                // Pre-calculate colors to avoid layout thrashing in traversal
+                const styles = getComputedStyle(document.documentElement);
+                const themeColor = new THREE.Color(styles.getPropertyValue('--theme-primary').trim());
 
                 model.traverse((child) => {
                     if (child.isMesh) {
-                        // Create more sophisticated materials
                         child.material = new THREE.MeshStandardMaterial({
-                            color: new THREE.Color(themeColor),
+                            color: themeColor,
                             metalness: 1.0,
                             roughness: 0.5,
-                            envMap: envMap,
                             envMapIntensity: 0.1
                         });
                     }
                 });
 
                 scene.add(model);
+
+                // Pre-compile shaders to prevent stutter and TBT on first render
+                renderer.compile(scene, camera);
 
                 // Hide loading state after successful load
                 setTimeout(() => {
@@ -725,6 +690,9 @@
             camera.updateProjectionMatrix();
             renderer.setSize(width, height);
             composer.setSize(width, height);
+
+            // Re-calculate RT size with correct ratio
+            renderTarget.setSize(width * pixelRatio, height * pixelRatio);
         }
 
         window.addEventListener('resize', onWindowResize);
